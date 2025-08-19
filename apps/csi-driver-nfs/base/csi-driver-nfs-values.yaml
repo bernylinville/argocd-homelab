@@ -1,9 +1,9 @@
 storageClass:
-  enabled: true
+  create: true
   name: nfs-csi
   parameters:
     server: "192.168.50.94"
-    share: "/mnt/nas/"
+    share: "/mnt/nas"
   reclaimPolicy: Retain
   mountOptions:
     - nfsvers=4.1
