@@ -1,0 +1,11 @@
+{
+  "appName": "ragflow",
+  "userGivenName": "ragflow",
+  "destNamespace": "ragflow",
+  "destServer": "https://kubernetes.default.svc",
+  "srcPath": "apps/ragflow/overlays/ai",
+  "srcRepoURL": "https://github.com/bernylinville/argocd-homelab.git",
+  "srcTargetRevision": "",
+  "labels": null,
+  "annotations": null
+}
