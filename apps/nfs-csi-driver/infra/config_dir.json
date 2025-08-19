@@ -1,0 +1,13 @@
+{
+  "appName": "nfs-csi-driver",
+  "userGivenName": "nfs-csi-driver",
+  "destNamespace": "kube-system",
+  "destServer": "https://kubernetes.default.svc",
+  "srcPath": ".",
+  "srcRepoURL": "https://github.com/bernylinville/argocd-homelab.git",
+  "srcTargetRevision": "",
+  "labels": null,
+  "annotations": null,
+  "exclude": "",
+  "include": ""
+}
