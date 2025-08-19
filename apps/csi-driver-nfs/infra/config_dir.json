@@ -1,6 +1,6 @@
 {
-  "appName": "nfs-csi-driver",
-  "userGivenName": "nfs-csi-driver",
+  "appName": "csi-driver-nfs",
+  "userGivenName": "csi-driver-nfs",
   "destNamespace": "kube-system",
   "destServer": "https://kubernetes.default.svc",
   "srcPath": ".",
