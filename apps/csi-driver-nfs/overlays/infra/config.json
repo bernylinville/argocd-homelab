@@ -3,7 +3,7 @@
   "userGivenName": "csi-driver-nfs",
   "destNamespace": "kube-system",
   "destServer": "https://kubernetes.default.svc",
-  "srcPath": "apps/csi-driver-nfs/infra",
+  "srcPath": "apps/csi-driver-nfs/overlays/infra",
   "srcRepoURL": "https://github.com/bernylinville/argocd-homelab.git",
   "srcTargetRevision": "",
   "labels": null,
