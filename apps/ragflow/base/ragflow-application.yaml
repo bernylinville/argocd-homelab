@@ -1,0 +1,77 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ai-ragflow
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: ai
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ragflow
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+  sources:
+    - repoURL: 'https://github.com/infiniflow/ragflow.git'
+      targetRevision: main
+      path: helm
+      helm:
+        releaseName: ragflow
+        valueFiles:
+          - $values/apps/ragflow/base/values.yaml
+
+    - repoURL: 'https://github.com/bernylinville/argocd-homelab.git'
+      targetRevision: main
+      ref: values
+
+  # --- Patches are moved here, at the Application spec level ---
+  patches:
+  # Patch A: For RAGFlow
+  - patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: MYSQL_PASSWORD
+          valueFrom: { secretKeyRef: { name: ragflow-credentials, key: mysql-password } }
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: MINIO_PASSWORD
+          valueFrom: { secretKeyRef: { name: ragflow-credentials, key: minio-password } }
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: REDIS_PASSWORD
+          valueFrom: { secretKeyRef: { name: ragflow-credentials, key: redis-password } }
+    target:
+      kind: Deployment
+      name: ragflow-ragflow
+  # Patch B: For MySQL
+  - patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value: { name: MYSQL_PASSWORD, valueFrom: { secretKeyRef: { name: ragflow-credentials, key: mysql-password } } }
+    target:
+      kind: Deployment
+      name: ragflow-mysql
+  # Patch C: For MinIO
+  - patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value: { name: MINIO_ROOT_PASSWORD, valueFrom: { secretKeyRef: { name: ragflow-credentials, key: minio-password } } }
+    target:
+      kind: Deployment
+      name: ragflow-minio
+  # Patch D: For Redis
+  - patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value: { name: REDIS_PASSWORD, valueFrom: { secretKeyRef: { name: ragflow-credentials, key: redis-password } } }
+    target:
+      kind: Deployment
+      name: ragflow-redis
