@@ -1,4 +1,76 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-- apps/ragflow/base
+- sealed-ragflow-credentials.yaml
+
+helmCharts:
+  # 2. 这是您已有的 RAGFlow Helm Chart 定义
+  - name: ragflow
+    repo: https://github.com/infiniflow/ragflow.git
+    targetRevision: main
+    releaseName: ragflow
+    valuesFile: values.yaml
+
+# 3. 定义一系列补丁，将统一的 Secret 注入到不同的 Deployment 中
+patches:
+  # 补丁 A: 为 RAGFlow 主服务的 Deployment 注入所有需要的密码
+  - patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef: { name: ragflow-credentials, key: mysql-password }
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: MINIO_PASSWORD
+          valueFrom:
+            secretKeyRef: { name: ragflow-credentials, key: minio-password }
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef: { name: ragflow-credentials, key: redis-password }
+    target:
+      kind: Deployment
+      name: ragflow-ragflow # 目标是 RAGFlow 主服务的 Deployment
+
+  # 补丁 B: 为 MySQL Deployment 注入 MySQL 密码
+  - patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef: { name: ragflow-credentials, key: mysql-password }
+    target:
+      kind: Deployment
+      name: ragflow-mysql # 目标是 MySQL 的 Deployment
+
+  # 补丁 C: 为 MinIO Deployment 注入 MinIO 密码
+  # 注意：MinIO Chart 通常需要 MINIO_ROOT_PASSWORD
+  - patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: MINIO_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef: { name: ragflow-credentials, key: minio-password }
+    target:
+      kind: Deployment
+      name: ragflow-minio # 目标是 MinIO 的 Deployment
+
+  # 补丁 D: 为 Redis Deployment 注入 Redis 密码
+  # 注意：Redis Chart 通常需要 REDIS_PASSWORD
+  - patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef: { name: ragflow-credentials, key: redis-password }
+    target:
+      kind: Deployment
+      name: ragflow-redis # 目标是 Redis 的 Deployment
