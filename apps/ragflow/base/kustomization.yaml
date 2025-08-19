@@ -1,13 +1,20 @@
+# apps/ragflow/base/kustomization.yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+
 resources:
-- sealed-ragflow-credentials.yaml
+  # 1. 引用您创建的、包含所有密码的加密文件
+  - sealed-ragflow-credentials.yaml
 
 helmCharts:
-  # 2. 这是您已有的 RAGFlow Helm Chart 定义
+  # 2. 定义要部署的 RAGFlow Helm Chart
   - name: ragflow
-    repo: https://github.com/infiniflow/ragflow.git
-    targetRevision: main
+    # 这是最关键的部分：
+    # 我们使用 'go-getter' 的语法来精确定位到 Git 仓库中的子目录。
+    # - "https://github.com/infiniflow/ragflow.git/" 是仓库地址。
+    # - "//helm" 表示仓库根目录下的 'helm' 子目录。
+    # - "?ref=main" 指定了使用 'main' 分支。
+    repo: "https://github.com/infiniflow/ragflow.git//helm?ref=main"
     releaseName: ragflow
     valuesFile: values.yaml
 
@@ -35,7 +42,7 @@ patches:
             secretKeyRef: { name: ragflow-credentials, key: redis-password }
     target:
       kind: Deployment
-      name: ragflow-ragflow # 目标是 RAGFlow 主服务的 Deployment
+      name: ragflow-ragflow
 
   # 补丁 B: 为 MySQL Deployment 注入 MySQL 密码
   - patch: |-
@@ -47,10 +54,9 @@ patches:
             secretKeyRef: { name: ragflow-credentials, key: mysql-password }
     target:
       kind: Deployment
-      name: ragflow-mysql # 目标是 MySQL 的 Deployment
+      name: ragflow-mysql
 
   # 补丁 C: 为 MinIO Deployment 注入 MinIO 密码
-  # 注意：MinIO Chart 通常需要 MINIO_ROOT_PASSWORD
   - patch: |-
       - op: add
         path: /spec/template/spec/containers/0/env/-
@@ -60,10 +66,9 @@ patches:
             secretKeyRef: { name: ragflow-credentials, key: minio-password }
     target:
       kind: Deployment
-      name: ragflow-minio # 目标是 MinIO 的 Deployment
+      name: ragflow-minio
 
   # 补丁 D: 为 Redis Deployment 注入 Redis 密码
-  # 注意：Redis Chart 通常需要 REDIS_PASSWORD
   - patch: |-
       - op: add
         path: /spec/template/spec/containers/0/env/-
@@ -73,4 +78,4 @@ patches:
             secretKeyRef: { name: ragflow-credentials, key: redis-password }
     target:
       kind: Deployment
-      name: ragflow-redis # 目标是 Redis 的 Deployment
+      name: ragflow-redis
