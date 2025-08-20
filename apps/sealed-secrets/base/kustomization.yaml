@@ -8,7 +8,7 @@ commonAnnotations:
   argocd.argoproj.io/sync-wave: "0"
 
 resources:
-  - bitnami.com_sealedsecrets.yaml
+  - https://raw.githubusercontent.com/bitnami-labs/sealed-secrets/refs/tags/v0.31.0/helm/sealed-secrets/crds/bitnami.com_sealedsecrets.yaml
 
 # This section tells Kustomize to render and apply a Helm chart
 helmCharts:
