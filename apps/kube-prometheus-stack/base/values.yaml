@@ -1,0 +1,170 @@
+# values-homelab.yaml
+crds:
+  enabled: true
+
+prometheus:
+  enabled: true
+  prometheusSpec:
+    # Data retention and storage
+    retention: 15d
+    retentionSize: 15GB
+    walCompression: true
+    # Storage configuration with Longhorn
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: nfs-csi
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 20Gi
+    # [SRE 建议] 针对 Homelab 环境大幅降低资源配置
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: 1000m
+        memory: 1.5Gi # 1536Mi
+    # Scrape configuration (30s 是非常适合 Homelab 的配置，保持不变)
+    scrapeInterval: 30s
+    evaluationInterval: 30s
+    scrapeTimeout: 10s
+    # Enable service discovery for dynamic targets
+    serviceMonitorSelectorNilUsesHelmValues: true
+    podMonitorSelectorNilUsesHelmValues: true
+    ruleSelectorNilUsesHelmValues: true
+    # Additional scrape configs for custom monitoring
+    additionalScrapeConfigs: []
+    # Remote write configuration (for external storage if needed)
+    remoteWrite: []
+
+# Alertmanager Configuration
+alertmanager:
+  enabled: true
+  alertmanagerSpec:
+    storage:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: nfs-csi
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 2Gi
+    # [SRE 建议] Alertmanager 是轻量级组件，降低资源配置
+    resources:
+      requests:
+        cpu: 25m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+    retention: 72h
+    configSecret: ""
+
+# Grafana Configuration
+grafana:
+  enabled: true
+  adminPassword: "prom-operator"
+  persistence:
+    enabled: true
+    storageClassName: nfs-csi
+    size: 5Gi
+    accessModes:
+      - ReadWriteOnce
+  # [SRE 建议] Grafana 在闲置时不需要太多资源
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 300m
+      memory: 384Mi
+  plugins: []
+  defaultDashboardsEnabled: true
+  defaultDashboardsTimezone: Asia/Shanghai
+  grafana.ini:
+    server:
+      root_url: https://grafana.devopsthink.org
+    security:
+      allow_embedding: true
+      cookie_secure: true
+      strict_transport_security: true
+    analytics:
+      reporting_enabled: false
+      check_for_updates: false
+    snapshots:
+      external_enabled: false
+    explore:
+      enabled: true
+    feature_toggles:
+      enable: correlations
+
+# Node Exporter Configuration
+nodeExporter:
+  enabled: true
+  hostRootFsMount:
+    enabled: true
+    mountPropagation: HostToContainer
+  # [SRE 建议] node-exporter 开销极低
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 50m
+      memory: 64Mi
+
+# kube-state-metrics Configuration
+kubeStateMetrics:
+  enabled: true
+  # [SRE 建议] 针对小型集群降低 KSM 资源配置
+  resources:
+    requests:
+      cpu: 25m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+# Prometheus Operator Configuration
+prometheusOperator:
+  enabled: true
+  # [SRE 建议] Operator 作为控制器，负载很低
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+# Additional monitoring components
+kubelet:
+  enabled: true
+  serviceMonitor:
+    interval: 30s
+kubeApiServer:
+  enabled: true
+  serviceMonitor:
+    interval: 30s
+kubeControllerManager:
+  enabled: true
+  serviceMonitor:
+    interval: 30s
+kubeScheduler:
+  enabled: true
+  serviceMonitor:
+    interval: 30s
+kubeEtcd:
+  enabled: true
+  serviceMonitor:
+    interval: 30s
+coreDns:
+  enabled: true
+  serviceMonitor:
+    interval: 30s
+kubeDns:
+  enabled: false
