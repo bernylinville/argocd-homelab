@@ -10,6 +10,9 @@ resources:
   # 1. 引用您创建的、包含所有密码的加密文件
   - sealed-ragflow-credentials.yaml
 
+helmGlobals:
+  chartHome: .
+
 helmCharts:
   # 2. 这是最终修正的 Helm Chart 定义
   #    - 'name' 字段现在指向与 Chart.yaml 中名称一致的本地目录名 ('ragflow')
