@@ -7,8 +7,8 @@ kind: Kustomization
 commonAnnotations:
   argocd.argoproj.io/sync-wave: "0"
 
-resources:
-  - https://raw.githubusercontent.com/bitnami-labs/sealed-secrets/refs/tags/v0.31.0/helm/sealed-secrets/crds/bitnami.com_sealedsecrets.yaml
+# resources:
+#   - https://raw.githubusercontent.com/bitnami-labs/sealed-secrets/refs/tags/v0.31.0/helm/sealed-secrets/crds/bitnami.com_sealedsecrets.yaml
 
 # This section tells Kustomize to render and apply a Helm chart
 helmCharts:
@@ -21,3 +21,4 @@ helmCharts:
   namespace: kube-system
   # (Optional but recommended) Point to a values file for custom configuration
   valuesFile: values.yaml
+  includeCRDs: true
