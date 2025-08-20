@@ -12,7 +12,8 @@ resources:
 
 helmCharts:
   # 2. 这是最终修正的 Helm Chart 定义
-  - name: charts # <-- name 字段现在指向包含 Chart.yaml 的本地目录名
+  #    - 'name' 字段现在指向与 Chart.yaml 中名称一致的本地目录名 ('ragflow')
+  - name: ragflow
     releaseName: ragflow
     namespace: ragflow
     # valuesFile 指向与 kustomization.yaml 同级的 values.yaml
@@ -20,7 +21,6 @@ helmCharts:
 
 patches:
   # 3. 在这里保留所有用于注入密码的补丁
-  # (补丁 A, B, C, D 的内容保持不变)
   - patch: |-
       - op: add
         path: /spec/template/spec/containers/0/env/-
