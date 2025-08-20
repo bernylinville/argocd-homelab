@@ -13,15 +13,9 @@ resources:
 helmCharts:
   # 2. 定义要部署的 RAGFlow Helm Chart
   - name: ragflow
-    # 使用 'go-getter' 语法精确定位到 Git 仓库中的子目录
-    # - "https://github.com/infiniflow/ragflow.git/" 是仓库地址
-    # - "//helm" 表示仓库根目录下的 'helm' 子目录
-    # - "?ref=main" 指定了使用 'main' 分支
-    repo: "https://github.com/infiniflow/ragflow.git//helm?ref=main"
+    path: charts
+    namespace: ragflow
     releaseName: ragflow
-    # 路径是相对于当前 kustomization.yaml 的。
-    # 如果您的 values.yaml 与 base 目录同级，路径应为 ../values.yaml
-    # 如果在 autopilot 的标准结构下，它通常在 apps/ragflow/values.yaml，所以相对于 base 是 ../../values.yaml
     valuesFile: values.yaml
 
 # 3. 定义一系列补丁，将统一的 Secret 注入到不同的 Deployment 中
