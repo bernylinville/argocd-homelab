@@ -2,6 +2,11 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+resources:
+  # 显式地从 Sealed Secrets 的官方 GitHub 仓库中拉取并应用 CRD 文件。
+  # 这一行强制 Kustomize 将 CRD 作为部署的一部分，解决了 CRD 被忽略的问题。
+  - https://github.com/bitnami-labs/sealed-secrets/blob/v0.31.0/helm/sealed-secrets/crds/bitnami.com_sealedsecrets.yaml
+
 # This section tells Kustomize to render and apply a Helm chart
 helmCharts:
 - name: sealed-secrets
