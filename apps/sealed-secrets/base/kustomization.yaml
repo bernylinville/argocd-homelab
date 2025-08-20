@@ -8,9 +8,7 @@ commonAnnotations:
   argocd.argoproj.io/sync-wave: "0"
 
 resources:
-  # 显式地从 Sealed Secrets 的官方 GitHub 仓库中拉取并应用 CRD 文件。
-  # 这一行强制 Kustomize 将 CRD 作为部署的一部分，解决了 CRD 被忽略的问题。
-  - https://raw.githubusercontent.com/bitnami-labs/sealed-secrets/refs/tags/v0.31.0/helm/sealed-secrets/crds/bitnami.com_sealedsecrets.yaml
+  - bitnami.com_sealedsecrets.yaml
 
 # This section tells Kustomize to render and apply a Helm chart
 helmCharts:
