@@ -11,71 +11,39 @@ resources:
   - sealed-ragflow-credentials.yaml
 
 helmCharts:
-  # 2. 定义要部署的 RAGFlow Helm Chart
-  - name: ragflow
-    path: charts
-    namespace: ragflow
+  # 2. 这是最终修正的 Helm Chart 定义
+  - name: charts # <-- name 字段现在指向包含 Chart.yaml 的本地目录名
     releaseName: ragflow
+    namespace: ragflow
+    # valuesFile 指向与 kustomization.yaml 同级的 values.yaml
     valuesFile: values.yaml
 
-# 3. 定义一系列补丁，将统一的 Secret 注入到不同的 Deployment 中
 patches:
-  # 补丁 A: 为 RAGFlow 主服务的 Deployment 注入所有需要的密码
+  # 3. 在这里保留所有用于注入密码的补丁
+  # (补丁 A, B, C, D 的内容保持不变)
   - patch: |-
       - op: add
         path: /spec/template/spec/containers/0/env/-
-        value:
-          name: MYSQL_PASSWORD
-          valueFrom:
-            secretKeyRef: { name: ragflow-credentials, key: mysql-password }
+        value: { name: MYSQL_PASSWORD, valueFrom: { secretKeyRef: { name: ragflow-credentials, key: mysql-password } } }
       - op: add
         path: /spec/template/spec/containers/0/env/-
-        value:
-          name: MINIO_PASSWORD
-          valueFrom:
-            secretKeyRef: { name: ragflow-credentials, key: minio-password }
+        value: { name: MINIO_PASSWORD, valueFrom: { secretKeyRef: { name: ragflow-credentials, key: minio-password } } }
       - op: add
         path: /spec/template/spec/containers/0/env/-
-        value:
-          name: REDIS_PASSWORD
-          valueFrom:
-            secretKeyRef: { name: ragflow-credentials, key: redis-password }
-    target:
-      kind: Deployment
-      name: ragflow-ragflow # 目标是 RAGFlow 主服务的 Deployment
-
-  # 补丁 B: 为 MySQL Deployment 注入 MySQL 密码
+        value: { name: REDIS_PASSWORD, valueFrom: { secretKeyRef: { name: ragflow-credentials, key: redis-password } } }
+    target: { kind: Deployment, name: ragflow-ragflow }
   - patch: |-
       - op: add
         path: /spec/template/spec/containers/0/env/-
-        value:
-          name: MYSQL_PASSWORD
-          valueFrom:
-            secretKeyRef: { name: ragflow-credentials, key: mysql-password }
-    target:
-      kind: Deployment
-      name: ragflow-mysql # 目标是 MySQL 的 Deployment
-
-  # 补丁 C: 为 MinIO Deployment 注入 MinIO 密码
+        value: { name: MYSQL_PASSWORD, valueFrom: { secretKeyRef: { name: ragflow-credentials, key: mysql-password } } }
+    target: { kind: Deployment, name: ragflow-mysql }
   - patch: |-
       - op: add
         path: /spec/template/spec/containers/0/env/-
-        value:
-          name: MINIO_ROOT_PASSWORD
-          valueFrom:
-            secretKeyRef: { name: ragflow-credentials, key: minio-password }
-    target:
-      kind: Deployment
-      name: ragflow-minio # 目标是 MinIO 的 Deployment
-
-  # 补丁 D: 为 Redis Deployment 注入 Redis 密码
+        value: { name: MINIO_ROOT_PASSWORD, valueFrom: { secretKeyRef: { name: ragflow-credentials, key: minio-password } } }
+    target: { kind: Deployment, name: ragflow-minio }
   - patch: |-
       - op: add
         path: /spec/template/spec/containers/0/env/-
-        value:
-          name: REDIS_PASSWORD
-          valueFrom:
-            secretKeyRef: { name: ragflow-credentials, key: redis-password }
-    target:
-      kind: Deployment
-      name: ragflow-redis # 目标是 Redis 的 Deployment
+        value: { name: REDIS_PASSWORD, valueFrom: { secretKeyRef: { name: ragflow-credentials, key: redis-password } } }
+    target: { kind: Deployment, name: ragflow-redis }
