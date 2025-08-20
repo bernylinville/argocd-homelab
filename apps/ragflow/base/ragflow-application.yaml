@@ -5,6 +5,9 @@ metadata:
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
+  # Add the sync wave annotation here
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   project: ai
   destination:
