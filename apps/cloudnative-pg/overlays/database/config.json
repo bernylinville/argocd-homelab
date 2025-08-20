@@ -1,0 +1,11 @@
+{
+  "appName": "cloudnative-pg",
+  "userGivenName": "cloudnative-pg",
+  "destNamespace": "cloudnative-pg",
+  "destServer": "https://kubernetes.default.svc",
+  "srcPath": "apps/cloudnative-pg/overlays/database",
+  "srcRepoURL": "https://github.com/bernylinville/argocd-homelab.git",
+  "srcTargetRevision": "",
+  "labels": null,
+  "annotations": null
+}
